@@ -1,5 +1,5 @@
-# Python 3.13 이미지 사용
-FROM python:3.13
+# Python 3.12 이미지 사용
+FROM python:3.12
 
 # 의존성 설치
 RUN pip install --upgrade pip
