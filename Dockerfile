@@ -14,7 +14,6 @@ WORKDIR /app
 
 # 로컬 파일을 컨테이너로 복사
 COPY ./main.py /app/main.py
-COPY ./data /app/data
 
 
 # main.py 실행

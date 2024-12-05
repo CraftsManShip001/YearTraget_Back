@@ -1,0 +1,10 @@
+name: fastapi
+app: python@3.12
+options:
+  ports: 8000
+  start: uvicorn main:app --host=0.0.0.0 --port=8000
+context:
+  git:
+    url: https://github.com/CraftsManShip001/YearTraget_Back
+    branch: main
+  preset: python-fastapi
