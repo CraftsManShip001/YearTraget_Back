@@ -62,8 +62,9 @@ def CreateMoon(request: CreateMoon):
     name = request.name
     password = getHashedPassword(request.password)
     moonid = getMoonid()
-    query = ("INSERT INTO moon (moonid,user_name,user_password,person) VALUES('%s','%s','%s',0)" %(getMoonid(),name,password))
-    cur.execute(query)
+    query = "INSERT INTO moon (moonid, user_name, user_password, person) VALUES (%s, %s, %s, 0)"
+    cur.execute(query, (moonid, name, password))
+
     conn.commit()
     return moonid
 
