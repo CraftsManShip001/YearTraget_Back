@@ -14,6 +14,9 @@ WORKDIR /app
 
 # 로컬 파일을 컨테이너로 복사
 COPY ./main.py /app/main.py
+COPY requirements.txt /app/requirements.txt
+
+RUN if [ -f "./requirements.txt" ]; then pip install -r requirements.txt; fi
 
 
 # main.py 실행
