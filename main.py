@@ -24,12 +24,7 @@ conn = pymysql.connect (host = DB_HOST,port = DB_PORT, user = DB_USER, password 
 cur = conn.cursor()
 
 app = FastAPI()
-'''
-cur = conn.cursor()
-query = "INSERT INTO moon (moonid,user_name,user_password,person) VALUES(889988,'서정현','test',1)"
-cur.execute(query)
-conn.commit()
-'''
+
 # CORS 설정
 origins = [
     "http://localhost:3000",
@@ -42,6 +37,15 @@ app.add_middleware(
     allow_methods=["POST","OPTIONS","GET"],  # 허용할 HTTP 메서드
     allow_headers=["*"],  # 허용할 헤더
 )
+def getDbConnection():
+    return pymysql.connect(
+        host=DB_HOST,
+        port=DB_PORT,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        db=DB_NAME,
+        charset='utf8'
+    )
 def getHashedPassword(password):
     return bcrypt_context.hash(password)
 
@@ -59,14 +63,19 @@ class CreateMoon(BaseModel):
 
 @app.post("/moon/newmoon")
 def CreateMoon(request: CreateMoon):
-    name = request.name
-    password = getHashedPassword(request.password)
-    moonid = getMoonid()
-    query = "INSERT INTO moon (moonid, user_name, user_password, person) VALUES (%s, %s, %s, 0)"
-    cur.execute(query, (moonid, name, password))
-
-    conn.commit()
-    return moonid
+    conn = getDbConnection()
+    cur = conn.cursor()
+    try:
+        name = request.name
+        password = getHashedPassword(request.password)
+        moonid = getMoonid()
+        query = "INSERT INTO moon (moonid, user_name, user_password, person) VALUES (%s, %s, %s, 0)"
+        cur.execute(query, (moonid, name, password))
+        conn.commit()   
+        return moonid
+    finally:
+        cur.close()
+        conn.close()
 
 if __name__ == "__main__":
     import uvicorn
