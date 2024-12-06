@@ -58,8 +58,10 @@ def getMoonid():
 class CreateMoon(BaseModel):
     name: str  # 이름
     password: str  # 비밀번호
+    password_check: str #비밀번호 확인
 
-
+class ViewMoon(BaseModel):
+    moonid:str
 
 @app.post("/moon/newmoon")
 def CreateMoon(request: CreateMoon):
@@ -67,7 +69,13 @@ def CreateMoon(request: CreateMoon):
     cur = conn.cursor()
     try:
         name = request.name
-        password = getHashedPassword(request.password)
+        password = request.password
+        password_check = request.password_check
+        
+        if password != password_check:
+            return 'Password is incorrect'
+        
+        password = getHashedPassword(password)
         moonid = getMoonid()
         query = "INSERT INTO moon (moonid, user_name, user_password, person) VALUES (%s, %s, %s, 0)"
         cur.execute(query, (moonid, name, password))
@@ -76,6 +84,23 @@ def CreateMoon(request: CreateMoon):
     finally:
         cur.close()
         conn.close()
+        
+@app.post('/moon/view')   
+def ViewMoon(request: ViewMoon):
+    conn = getDbConnection()
+    cur = conn.cursor()
+    try:
+        moonid = request.moonid
+        query = "SELECT * FROM moon where moonid = %s"
+        cur.execute(query, (moonid))
+        result = cur.fetchall()
+        return result[0][1]
+    except:
+        return 'error'
+    finally:
+        cur.close()
+        conn.close()
+
 
 if __name__ == "__main__":
     import uvicorn
