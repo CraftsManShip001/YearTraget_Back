@@ -61,7 +61,7 @@ class CreateMoon(BaseModel):
     password_check: str #비밀번호 확인
 
 class ViewMoon(BaseModel):
-    moonid:str
+    moonid:int
 
 @app.post("/moon/newmoon")
 def CreateMoon(request: CreateMoon):
@@ -81,6 +81,9 @@ def CreateMoon(request: CreateMoon):
         cur.execute(query, (moonid, name, password))
         conn.commit()   
         return moonid
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        return "An unexpected error occurred", 500
     finally:
         cur.close()
         conn.close()
@@ -91,12 +94,16 @@ def ViewMoon(request: ViewMoon):
     cur = conn.cursor()
     try:
         moonid = request.moonid
+        check = int(moonid)
         query = "SELECT * FROM moon where moonid = %s"
-        cur.execute(query, (moonid))
+        cur.execute(query, (moonid,))
         result = cur.fetchall()
+        if not result:
+            return "Moon ID not found", 404
         return result[0][1]
-    except:
-        return 'error'
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        return "An unexpected error occurred", 500
     finally:
         cur.close()
         conn.close()
