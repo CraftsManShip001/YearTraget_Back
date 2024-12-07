@@ -27,6 +27,7 @@ app = FastAPI()
 
 # CORS 설정
 origins = [
+    "http://localhost:3000"
     "http://localhost:3001",
 ]
 
@@ -71,8 +72,6 @@ class WriteWish(BaseModel):
 
 @app.post("/moon/newmoon")
 def CreateMoon(request: CreateMoon):
-    conn = getDbConnection()
-    cur = conn.cursor()
     try:
         with getDbConnection() as conn:
             with conn.cursor() as cur:
