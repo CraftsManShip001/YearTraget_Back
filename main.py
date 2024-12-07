@@ -98,8 +98,6 @@ def CreateMoon(request: CreateMoon):
         
 @app.post('/moon/view')   
 def ViewMoon(request: ViewMoon):
-    conn = getDbConnection()
-    cur = conn.cursor()
     try:
         with getDbConnection() as conn:
             with conn.cursor() as cur:
