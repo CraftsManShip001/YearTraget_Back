@@ -1,15 +1,15 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 from fastapi.middleware.cors import CORSMiddleware
 from passlib.context import CryptContext
 import pymysql
-import csv
-import math
+import logging
 import os
 import random
 from dotenv import load_dotenv
-import os
 
+
+logging.basicConfig(level=logging.ERROR, filename='app.log', format='%(asctime)s - %(message)s')
 load_dotenv()
 
 DB_HOST = os.getenv("DB_HOST")
@@ -62,28 +62,36 @@ class CreateMoon(BaseModel):
 
 class ViewMoon(BaseModel):
     moonid:int
+    
+class WriteWish(BaseModel):
+    name: str = Field(..., max_length=50)
+    moonid: int
+    wish: str = Field(..., max_length=255)
+    
 
 @app.post("/moon/newmoon")
 def CreateMoon(request: CreateMoon):
     conn = getDbConnection()
     cur = conn.cursor()
     try:
-        name = request.name
-        password = request.password
-        password_check = request.password_check
-        
-        if password != password_check:
-            return 'Password is incorrect'
-        
-        password = getHashedPassword(password)
-        moonid = getMoonid()
-        query = "INSERT INTO moon (moonid, user_name, user_password, person) VALUES (%s, %s, %s, 0)"
-        cur.execute(query, (moonid, name, password))
-        conn.commit()   
-        return moonid
+        with getDbConnection() as conn:
+            with conn.cursor() as cur:
+                name = request.name
+                password = request.password
+                password_check = request.password_check
+                
+                if password != password_check:
+                    return 'Password is incorrect'
+                
+                password = getHashedPassword(password)
+                moonid = getMoonid()
+                query = "INSERT INTO moon (moonid, user_name, user_password, person) VALUES (%s, %s, %s, 0)"
+                cur.execute(query, (moonid, name, password))
+                conn.commit()
+            return moonid
     except Exception as e:
-        print(f"Error occurred: {e}")
-        return "An unexpected error occurred", 500
+        logging.error(f"Error occurred: {e}")
+        return {"error": "Internal server error"}, 500
     finally:
         cur.close()
         conn.close()
@@ -93,17 +101,39 @@ def ViewMoon(request: ViewMoon):
     conn = getDbConnection()
     cur = conn.cursor()
     try:
-        moonid = request.moonid
-        check = int(moonid)
-        query = "SELECT * FROM moon where moonid = %s"
-        cur.execute(query, (moonid,))
-        result = cur.fetchall()
-        if not result:
-            return "Moon ID not found", 404
-        return result[0][1]
+        with getDbConnection() as conn:
+            with conn.cursor() as cur:
+                moonid = request.moonid
+                check = int(moonid)
+                query = "SELECT * FROM moon where moonid = %s"
+                cur.execute(query, (moonid,))
+                result = cur.fetchall()
+                if not result:
+                    return "Moon ID not found", 404
+            return result[0][1]
     except Exception as e:
-        print(f"Error occurred: {e}")
-        return "An unexpected error occurred", 500
+        logging.error(f"Error occurred: {e}")
+        return {"error": "Internal server error"}, 500
+    finally:
+        cur.close()
+        conn.close()
+@app.post('/moon/write')
+def WriteWish(request: WriteWish):
+    try:
+        with getDbConnection() as conn:
+            with conn.cursor() as cur:
+                name = request.name
+                moonid = request.moonid
+                wish = request.wish
+                
+                check = int(moonid)
+                query = "INSERT INTO wishes (moonid, writer, wish) VALUES (%s, %s, %s)"
+                cur.execute(query, (moonid,name,wish))
+                conn.commit()
+            return {"message": "Wish saved successfully"}, 201
+    except Exception as e:
+        logging.error(f"Error occurred: {e}")
+        return {"error": "Internal server error"}, 500
     finally:
         cur.close()
         conn.close()
