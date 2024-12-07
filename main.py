@@ -92,9 +92,6 @@ def CreateMoon(request: CreateMoon):
     except Exception as e:
         logging.error(f"Error occurred: {e}")
         return {"error": "Internal server error"}, 500
-    finally:
-        cur.close()
-        conn.close()
         
 @app.post('/moon/view')   
 def ViewMoon(request: ViewMoon):
@@ -112,9 +109,6 @@ def ViewMoon(request: ViewMoon):
     except Exception as e:
         logging.error(f"Error occurred: {e}")
         return {"error": "Internal server error"}, 500
-    finally:
-        cur.close()
-        conn.close()
 @app.post('/moon/write')
 def WriteWish(request: WriteWish):
     try:
@@ -132,9 +126,6 @@ def WriteWish(request: WriteWish):
     except Exception as e:
         logging.error(f"Error occurred: {e}")
         return {"error": "Internal server error"}, 500
-    finally:
-        cur.close()
-        conn.close()
 
 
 if __name__ == "__main__":
