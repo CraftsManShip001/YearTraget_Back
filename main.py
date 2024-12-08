@@ -50,6 +50,8 @@ def getDbConnection():
 def getHashedPassword(password):
     return bcrypt_context.hash(password)
 
+
+
 def getMoonid():
     x = ''
     for _ in range(8):
@@ -69,6 +71,9 @@ class WriteWish(BaseModel):
     moonid: int
     wish: str = Field(..., max_length=255)
     
+class GetPersonCount(BaseModel):
+    moonid: int
+    password: str
 
 @app.post("/moon/newmoon")
 def CreateMoon(request: CreateMoon):
@@ -118,14 +123,40 @@ def WriteWish(request: WriteWish):
                 wish = request.wish
                 
                 check = int(moonid)
+                if not moonid or not name or not wish:
+                    return {"error": "All fields are required"}, 400
                 query = "INSERT INTO wishes (moonid, writer, wish) VALUES (%s, %s, %s)"
                 cur.execute(query, (moonid,name,wish))
+                
+                query  = "UPDATE moon set person = person + 1 WHERE moonid = %s"
+                cur.execute(query,(moonid,))
                 conn.commit()
             return "Wish saved successfully"
     except Exception as e:
         logging.error(f"Error occurred: {e}")
         return {"error": "Internal server error"}, 500
 
+@app.post('/moon/count')
+def GetPersonCount(request:GetPersonCount):
+    try:
+        with getDbConnection() as conn:
+            with conn.cursor() as cur:
+                moonid = request.moonid
+                check = int(moonid)
+                password = request.password
+                query = "SELECT user_password FROM moon where moonid = %s"
+                cur.execute(query, (moonid,))
+                result = cur.fetchone()
+                if result and getHashedPassword(password) == result[0]:
+                    query = "SELECT person FROM moon where moonid = %s"
+                    cur.execute(query, (moonid,))
+                    person = cur.fetchone()
+                    return person
+                else:
+                    return {"error": "Password is incorrect"}, 401
+    except Exception as e:
+        logging.error(f"Error occurred: {e}")
+        return {"error": "Internal server error"}, 500
 
 if __name__ == "__main__":
     import uvicorn
