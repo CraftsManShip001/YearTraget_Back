@@ -121,7 +121,7 @@ def WriteWish(request: WriteWish):
                 query = "INSERT INTO wishes (moonid, writer, wish) VALUES (%s, %s, %s)"
                 cur.execute(query, (moonid,name,wish))
                 conn.commit()
-            return {"message": "Wish saved successfully"}, 201
+            return "Wish saved successfully"
     except Exception as e:
         logging.error(f"Error occurred: {e}")
         return {"error": "Internal server error"}, 500
