@@ -6,6 +6,8 @@ import pymysql
 import logging
 import os
 import random
+import bcrypt
+from passlib.hash import bcrypt
 from dotenv import load_dotenv
 
 
@@ -47,10 +49,12 @@ def getDbConnection():
         db=DB_NAME,
         charset='utf8'
     )
+    
 def getHashedPassword(password):
-    return bcrypt_context.hash(password)
+    return bcrypt.hash(password.encode('utf-8'))
 
-
+def checkPassword(password, hashed):
+    return bcrypt.verify(password, hashed)
 
 def getMoonid():
     x = ''
@@ -95,6 +99,7 @@ def CreateMoon(request: CreateMoon):
             return moonid
     except Exception as e:
         logging.error(f"Error occurred: {e}")
+        print(e)
         return {"error": "Internal server error"}, 500
         
 @app.post('/moon/view')   
@@ -147,13 +152,13 @@ def GetPersonCount(request:GetPersonCount):
                 query = "SELECT user_password FROM moon where moonid = %s"
                 cur.execute(query, (moonid,))
                 result = cur.fetchone()
-                if result and getHashedPassword(password) == result[0]:
+                if result and checkPassword(password,result[0]):
                     query = "SELECT person FROM moon where moonid = %s"
                     cur.execute(query, (moonid,))
                     person = cur.fetchone()
                     return person
                 else:
-                    return {"error": "Password is incorrect"}, 401
+                    return {"error": result[0]}, 401
     except Exception as e:
         logging.error(f"Error occurred: {e}")
         return {"error": "Internal server error"}, 500

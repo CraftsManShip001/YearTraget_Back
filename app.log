@@ -1,3 +1,15 @@
 2024-12-08 15:44:13,263 - Error occurred: (1062, "Duplicate entry '256636' for key 'PRIMARY'")
 2024-12-08 15:44:23,459 - Error occurred: (1062, "Duplicate entry '256636' for key 'PRIMARY'")
 2024-12-08 15:44:29,789 - Error occurred: (1062, "Duplicate entry '256636' for key 'PRIMARY'")
+2024-12-08 16:59:19,662 - Error occurred: type object 'bcrypt' has no attribute 'hashpw'
+2024-12-08 17:01:06,934 - Error occurred: type object 'bcrypt' has no attribute 'hashpw'
+2024-12-08 17:06:35,903 - Error occurred: type object 'bcrypt' has no attribute 'hashpw'
+2024-12-08 17:08:28,243 - Error occurred: type object 'bcrypt' has no attribute 'hashpw'
+2024-12-08 17:09:00,598 - Error occurred: type object 'bcrypt' has no attribute 'hashpw'
+2024-12-08 17:10:13,584 - Error occurred: type object 'bcrypt' has no attribute 'hashpw'
+2024-12-08 17:11:01,345 - Error occurred: type object 'bcrypt' has no attribute 'hashpw'
+2024-12-08 17:28:55,592 - Error occurred: type object 'bcrypt' has no attribute 'hashpw'
+2024-12-08 17:37:29,146 - Error occurred: type object 'bcrypt' has no attribute 'hashpw'
+2024-12-08 17:38:04,495 - Error occurred: 'str' object has no attribute 'decode'
+2024-12-08 17:38:52,293 - Error occurred: type object 'bcrypt' has no attribute 'hashpw'
+2024-12-08 17:39:21,835 - Error occurred: 'str' object has no attribute 'decode'
