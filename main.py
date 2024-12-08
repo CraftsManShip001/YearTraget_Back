@@ -156,7 +156,10 @@ def GetPersonCount(request:GetPersonCount):
                     query = "SELECT person FROM moon where moonid = %s"
                     cur.execute(query, (moonid,))
                     person = cur.fetchone()
-                    return person
+                    query = "SELECT user_name FROM moon where moonid = %s"
+                    cur.execute(query, (moonid,))
+                    name = cur.fetchone()
+                    return {"person":person,"name":name}
                 else:
                     return {"error": result[0]}, 401
     except Exception as e:
