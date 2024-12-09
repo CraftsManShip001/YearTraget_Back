@@ -79,6 +79,13 @@ class GetPersonCount(BaseModel):
     moonid: int
     password: str
 
+class ViewMoon(BaseModel):
+    moonid: int
+
+class ViewPerson(BaseModel):
+    moonid: int
+    password: str
+
 @app.post("/moon/newmoon")
 def CreateMoon(request: CreateMoon):
     try:
@@ -161,10 +168,39 @@ def GetPersonCount(request:GetPersonCount):
                     name = cur.fetchone()
                     return {"person":person,"name":name}
                 else:
-                    return {"error": result[0]}, 401
+                    return {"error": "Password is incorrect"}, 401
     except Exception as e:
         logging.error(f"Error occurred: {e}")
         return {"error": "Internal server error"}, 500
+
+@app.post('/moon/person')
+def ViewPerson(request:ViewPerson):
+    try:
+        with getDbConnection() as conn:
+            with conn.cursor() as cur:
+                moonid = request.moonid
+                check = int(moonid)
+                password = request.password
+                query = "SELECT user_password FROM moon where moonid = %s"
+                cur.execute(query, (moonid,))
+                result = cur.fetchone()
+                if result and checkPassword(password,result[0]):
+                    query = "SELECT person FROM moon where moonid = %s"
+                    cur.execute(query, (moonid,))
+                    person = cur.fetchone()
+                    query = "SELECT writer FROM wishes where moonid = %s"
+                    cur.execute(query, (moonid,))
+                    names = cur.fetchall()
+                    return {"person":person,"names":names}
+                else:
+                    return {"error": "Password is incorrect"}, 401
+                
+    except Exception as e:
+        logging.error(f"Error occurred: {e}")
+        return {"error": "Internal server error"}, 500
+    
+
+
 
 if __name__ == "__main__":
     import uvicorn
