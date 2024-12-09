@@ -31,6 +31,7 @@ app = FastAPI()
 origins = [
     "http://localhost:3000",
     "http://localhost:3001",
+    "https://yeartarget.vercel.app",
 ]
 
 app.add_middleware(
