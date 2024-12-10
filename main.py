@@ -86,6 +86,10 @@ class ViewMoon(BaseModel):
 class ViewPerson(BaseModel):
     moonid: int
     password: str
+    
+class ViewWishes(BaseModel):
+    moonid: int
+    password: str
 
 @app.post("/moon/newmoon")
 def CreateMoon(request: CreateMoon):
@@ -200,8 +204,32 @@ def ViewPerson(request:ViewPerson):
         logging.error(f"Error occurred: {e}")
         return {"error": "Internal server error"}, 500
     
-
-
+@app.post('/moon/wishes')
+def ViewWishes(request:ViewWishes):
+    try:
+        with getDbConnection() as conn:
+            with conn.cursor() as cur:
+                moonid = request.moonid
+                check = int(moonid)
+                password = request.password
+                query = "SELECT user_password FROM moon where moonid = %s"
+                cur.execute(query, (moonid,))
+                result = cur.fetchone()
+                if result and checkPassword(password,result[0]):
+                    query = "SELECT writer,wish FROM wishes where moonid = %s"
+                    cur.execute(query, (moonid,))
+                    results = cur.fetchall()
+                    names = []
+                    wishes = []
+                    for x in results:
+                        names.append(x[0])
+                        wishes.append(x[1])
+                    return {"names":names,"wishes":wishes}
+                else:
+                    return {"error": "Password is incorrect"}, 401
+    except Exception as e:
+        logging.error(f"Error occurred: {e}")
+        return {"error": "Internal server error"}, 500
 
 if __name__ == "__main__":
     import uvicorn

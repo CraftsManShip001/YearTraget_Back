@@ -13,3 +13,6 @@
 2024-12-08 17:38:04,495 - Error occurred: 'str' object has no attribute 'decode'
 2024-12-08 17:38:52,293 - Error occurred: type object 'bcrypt' has no attribute 'hashpw'
 2024-12-08 17:39:21,835 - Error occurred: 'str' object has no attribute 'decode'
+2024-12-10 23:56:17,218 - Error occurred: not enough values to unpack (expected 2, got 1)
+2024-12-10 23:56:25,528 - Error occurred: not enough values to unpack (expected 2, got 1)
+2024-12-10 23:57:05,244 - Error occurred: tuple index out of range
